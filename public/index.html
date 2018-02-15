@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0022)http://127.0.0.1:5000/ -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>meine Rezepte</title>
+    <link rel="shortcut icon" href="./favicon.ico">
+
+    <!-- JQuery -->
+    <script src="./js/jquery-3.2.1.slim.min.js"></script>
+    
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./js/bootbox.min.js"></script>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" type="text/css" href="./css/font-awesome.min.css"/>
+
+    <!-- Mustache for HTML templates -->
+    <script type="text/javascript" src="./js/mustache.min.js"></script>
+
+    <!-- Marked for MarkDown rendering -->
+    <script type="text/javascript" src="./js/marked.js"></script>
+
+    <!-- Croppie for image scale and crop -->
+    <link rel="stylesheet" type="text/css" href="./css/croppie.min.css"/>
+    <script type="text/javascript" src="./js/croppie.min.js"></script>
+
+    <!-- Firebase of course -->
+    <script type="text/javascript" src="./js/firebase.js"></script>
+    <script type="text/javascript" src="./js/firebase-app.js"></script>
+    <script type="text/javascript" src="./js/firebase-auth.js"></script>
+    <script type="text/javascript" src="./js/firebase-firestore.js"></script>
+    <script type="text/javascript" src="./js/firebase-storage.js"></script>
+
+    <!-- The custom stuff -->
+    <script type="text/javascript" src="./js/config.js"></script>
+    <script type="text/javascript" src="./js/firebasebackend.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/rezepte.css"/>
+    <script type="text/javascript" src="./js/rezepte.js"></script>
+
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="alphabet">
+                <div class="alphabet-item noentries"><span>A</span></div>
+                <div class="alphabet-item noentries"><span>B</span></div>
+                <div class="alphabet-item noentries"><span>C</span></div>
+                <div class="alphabet-item noentries"><span>D</span></div>
+                <div class="alphabet-item noentries"><span>E</span></div>
+                <div class="alphabet-item noentries"><span>F</span></div>
+                <div class="alphabet-item noentries"><span>G</span></div>
+                <div class="alphabet-item noentries"><span>H</span></div>
+                <div class="alphabet-item noentries"><span>I</span></div>
+                <div class="alphabet-item noentries"><span>J</span></div>
+                <div class="alphabet-item noentries"><span>K</span></div>
+                <div class="alphabet-item noentries"><span>L</span></div>
+                <div class="alphabet-item noentries"><span>M</span></div>
+                <div class="alphabet-item noentries"><span>N</span></div>
+                <div class="alphabet-item noentries"><span>O</span></div>
+                <div class="alphabet-item noentries"><span>P</span></div>
+                <div class="alphabet-item noentries"><span>Q</span></div>
+                <div class="alphabet-item noentries"><span>R</span></div>
+                <div class="alphabet-item noentries"><span>S</span></div>
+                <div class="alphabet-item noentries"><span>T</span></div>
+                <div class="alphabet-item noentries"><span>U</span></div>
+                <div class="alphabet-item noentries"><span>V</span></div>
+                <div class="alphabet-item noentries"><span>W</span></div>
+                <div class="alphabet-item noentries"><span>X</span></div>
+                <div class="alphabet-item noentries"><span>Y</span></div>
+                <div class="alphabet-item noentries"><span>Z</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div id="recipesListContainer" class="col mx-auto">
+            </div>
+        </div>
+        <div class="row">
+            <div id="recipeNewContainer" class="col mx-auto">
+            </div>
+        </div>
+    </div>
+</body>
+<script id="recipe-template" type="x-tmpl-mustache">
+<div class="card recipe">
+    <div class="card-header" id="recipe-{{ id }}">
+        <h5 class="mb-0">
+        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne-{{ id }}" aria-expanded="false" aria-controls="collapseOne">
+            {{ title }}
+        </button>
+        <button class="recipe-remove btn btn-link float-right fa fa-trash" data-recipe-id="{{ id }}" data-recipe-title="{{ title }}"></button>
+        <button class="recipe-edit btn btn-link float-right fa fa-edit" data-recipe-id="{{ id }}" data-recipe-title="{{ title }}"></button>
+        </h5>
+    </div>
+    <div id="collapseOne-{{ id }}" class="collapse" aria-labelledby="recipe-{{ id }}" data-parent="#recipesListContainer">
+        <div class="card-body">
+            <div class="recipe-description-container">
+                <h6>Zutaten</h6>
+                <div>{{ &description }}</div>
+            </div>
+            <div class="recipe-content-container">
+                <h6>Zubereitung und sonstiges</h6>
+                <div>{{ &content }}</div>
+            </div>
+            <div class="recipe-pictures-container">
+                <h6>Bilder</h6>
+                <div class="pictureList"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</script>
+
+<script id="recipe-update-template" type="x-tmpl-mustache">
+<div id="collapseOne-{{ id }}" class="collapse" aria-labelledby="recipe-{{ id }}" data-parent="#recipesListContainer">
+    <div class="card-body">
+        <div class="recipe-update-title-container">
+            <h6>Titel</h6>
+            <input class="recipe-update-title" type="text" class="form-control" value="{{ title }}"></input>
+        </div>
+        <div class="recipe-update-description-container">
+            <h6>Zutaten</h6>
+            <textarea class="recipe-update-description form-control">{{ description }}</textarea>
+        </div>
+        <div class="recipe-update-content-container">
+            <h6>Zubereitung und sonstiges</h6>
+            <textarea class="recipe-update-content form-control">{{ content }}</textarea>
+        </div>
+        <div class="recipe-update-content-container">
+            <button type="submit" class="btn btn-primary recipe-update-submit">Submit</button>
+        </div>
+        
+        <div class="recipe-update-pictures-container">
+            <h6>Bilder</h6>
+            <div class="pictureList"></div>
+            <div class="pictureArea" data-recipe-id="{{ id }}" data-recipe-title="{{ title }}">
+                <input type="file" class="imageFile" accept="image/jpeg,image/png,image/gif" />
+                <img id="preview_image" src=""/>
+            </div>
+        </div>
+    </div>
+</div>
+</script>
+<script id="recipe-update-picture-remove-template" type="x-tmpl-mustache">
+<div class="pictureUpdate">
+    <img src="{{ url }}" />
+    <button class="picture-remove btn btn-link float-right fa fa-trash" data-recipe-id="{{ id }}" data-picture-path="{{ picturePath }}" data-recipe-title="{{ title }}"></button>
+</div>
+</script>
+
+<script id="recipe-new-template" type="x-tmpl-mustache">
+<div id="recipeNew" class="card recipe">
+    <div class="card-header" id="recipe-new">
+        <h5 class="mb-0">
+        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne-new" aria-expanded="false" aria-controls="collapseOne">
+            Neues Rezept
+        </button>
+        </h5>
+    </div>
+    <div id="collapseOne-new" class="collapse" aria-labelledby="recipe-new">
+        <div class="card-body">
+            <div class="recipe-update-title-container">
+                <h6>Titel</h6>
+                <input id="recipe-new-title" type="text" class="form-control" placeholder="Titel"/>
+            </div>
+            <div class="recipe-update-description-container">
+                <h6>Zutaten</h6>
+                <textarea id="recipe-new-description" class="form-control" placeholder="Zutaten (in MarkDown) optimalerweise mit einem '-' vor jeder Zeile"></textarea>
+            </div>
+            <div class="recipe-update-content-container">
+                <h6>Zubereitung und sonstiges</h6>
+                <textarea id="recipe-new-content" class="form-control" placeholder="Zubereitung (in MarkDown) zB. __für fette Schrift__ oder *für schräge Schrift* "></textarea>
+            </div>
+            <div class="recipe-update-content-container">
+                <button id="recipe-new-submit" type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+</script>
+</html>

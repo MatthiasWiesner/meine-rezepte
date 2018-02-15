@@ -1,0 +1,169 @@
+body {
+    padding-left: 5px;
+    padding-right: 5px;
+    overflow-y: scroll;
+}
+
+.slick-prev:before,
+.slick-next:before {
+  color: #ccc;
+}
+
+.alphabet {
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
+.alphabet-item {
+    height: 30px;
+    border-radius: 5px;
+    border: 1px solid grey;
+    cursor: pointer;
+    margin: 2px;
+    float: left;
+    padding: 3px;
+}
+
+.alphabet .noentries {
+    background-color: rgb(250, 250, 250);
+    color: darkgray;
+    cursor: default;
+}
+
+.slick-slide {
+    outline: none !important;
+}
+
+.alphabet-item-active {
+    background-color: rgb(101, 150, 255);
+    color: white;
+}
+
+.alphabet-item span {
+    height: inherit;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: inline-flex;
+
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+
+    align-items: center;
+}
+
+/* recipe list */
+
+#recipeList .card-header {
+    height: 35px; 
+    padding-top: 0px;
+}
+
+#recipesListContainer, #recipeNewContainer {
+    padding: 0px;
+}
+
+.recipe {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 5px;
+}
+.recipe-description-container,
+.recipe-content-container, 
+.recipe-pictures-container,
+.recipe-update-title-container, 
+.recipe-update-description-container, 
+.recipe-update-content-container, 
+.recipe-update-pictures-container {
+    margin-bottom: 30px;
+}
+
+.recipe-description-container h6, 
+.recipe-content-container h6, 
+.recipe-pictures-container h6,
+.recipe-update-title-container h6, 
+.recipe-update-description-container h6, 
+.recipe-update-content-container h6, 
+.recipe-update-pictures-container h6 {
+    border-bottom: 1px dashed silver;
+}
+
+
+.recipe .pictureList img {
+    margin-top: 10px;
+    margin-right: 10px;
+    border: 1px inset #ddd;
+    padding: 5px;
+    background-color: silver;
+}
+.recipe .pictureList .pictureUpdate {
+    width: fit-content;
+}
+
+.card-header {
+    height: 35px; 
+    padding-top: 0px;
+}
+
+#recipeNew button {
+    padding-top: 3px;
+}
+
+#recipe-new-title {
+    height: 25px; 
+    padding: 0px;
+    padding-left: 3px;
+    margin-bottom: 10px;
+}
+
+#recipe-new-description {
+    height: 150px; 
+    padding: 0px;
+    padding-left: 3px;
+    margin-bottom: 10px;
+}
+
+#recipe-new-content {
+    height: 150px; 
+    padding: 0px;
+    padding-left: 3px;
+    margin-bottom: 10px;
+}
+
+.recipe-update-title {
+    height: 25px; 
+    padding: 0px;
+    padding-left: 3px;
+    margin-bottom: 10px;
+}
+
+.recipe-update-description {
+    height: 150px; 
+    padding: 0px;
+    padding-left: 3px;
+    margin-bottom: 10px;
+}
+
+.recipe-update-content {
+    height: 150px; 
+    padding: 0px;
+    padding-left: 3px;
+    margin-bottom: 10px;
+}
+
+.pictureArea {
+    margin-top: 15px;
+    padding: 0px;
+}
+
+.croppie-container {
+    margin-top: 30px;
+    padding-top: 20px;
+    border: 1px dashed silver;
+    margin-bottom: 30px;
+}
+
+#pictureRotate, #pictureDestroy {
+    margin-left: 5px;
+    border: none;
+    color: grey;
+}
