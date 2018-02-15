@@ -270,7 +270,7 @@ function MeineRezepte(){
             self.initNewPicture();
 
             $('.recipe-update-submit', $('#collapseOne-' + recipeId)).on('click', function(){
-                this.onRecipeUpdate(recipeId);
+                self.onRecipeUpdate(recipeId);
             });
         });
     };
