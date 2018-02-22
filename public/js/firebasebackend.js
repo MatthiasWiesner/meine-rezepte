@@ -27,7 +27,7 @@ function FirebaseBackend(){
 
     this.login = function(email, password){
         firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
-            alert(error.message);
+            bootbox.alert(error.message);
         });
     };
 
@@ -43,33 +43,41 @@ function FirebaseBackend(){
         return self.storage.ref();
     };
 
-    this.getRecipesTitleStart = function(callback){
+    this.getRecipesTitles = function(finishedCallback){
         var titles = new Array();
         self.getRecipesCollection().get().then(function(querySnapshot){
             querySnapshot.forEach(function(doc){
                 var recipe = doc.data();
-                titles.push(recipe.title[0]);
+                titles.push(recipe.title);
             });
-            jQuery.unique(titles);
-            callback(titles);
+            finishedCallback(titles);
         });
     };
 
-    this.getRecipesByTitle = function(titleStartWith, displaySingleRecipe, uncollapseRecipe){
+    this.getRecipesByTitle = function(titleStartWith, itemCallback, finishedCallback){
         var s = titleStartWith.toUpperCase();
         var e = String.fromCharCode(s.charCodeAt() + 1)
 
         self.getRecipesCollection().where('title', '>=', s).where('title', '<', e).get().then(function(querySnapshot){
             querySnapshot.forEach(function(doc){
-                displaySingleRecipe(doc);
+                itemCallback(doc);
             });
-            uncollapseRecipe();
+            finishedCallback();
         });
     };
 
-    this.getRecipe = function(recipeId, callback){
+    this.searchRecipeByTitle = function(title, itemCallback, notFoundCallback){
+        self.getRecipesCollection().where('title', '==', title).get().then(function(querySnapshot){
+            querySnapshot.forEach(function(doc){
+                itemCallback(doc);
+            });
+            notFoundCallback();
+        });
+    }
+
+    this.getRecipe = function(recipeId, itemCallback){
         self.getRecipesCollection().doc(recipeId).get().then(function(doc){
-            callback(doc);
+            itemCallback(doc);
         });
     };
 
@@ -84,7 +92,7 @@ function FirebaseBackend(){
         });
     };
 
-    this.updateRecipe = function(recipeId, title, description, content, callback){
+    this.updateRecipe = function(recipeId, title, description, content, itemCallback){
         if (title == undefined || title.length == 0) {
             return false;
         }
@@ -96,11 +104,11 @@ function FirebaseBackend(){
             recipe.description = description,
             recipe.content = content
             self.getRecipesCollection().doc(recipeId).set(recipe);
-            callback();
+            itemCallback(doc);
         });
     };
 
-    this.deleteRecipe = function(recipeId, callback){
+    this.deleteRecipe = function(recipeId, itemCallback){
         self.getRecipesCollection().doc(recipeId).get().then(function(doc){
             var recipe = doc.data();
             if (recipe.pictureList != undefined){
@@ -109,11 +117,11 @@ function FirebaseBackend(){
                 });
             }
             self.getRecipesCollection().doc(recipeId).delete();
-            callback();
+            itemCallback(doc);
         });
     }
 
-    this.uploadPicture = function(recipeId, picture, callback){
+    this.uploadPicture = function(recipeId, picture, itemCallback){
         makeid = function() {
             var text = "";
             var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -127,12 +135,11 @@ function FirebaseBackend(){
         var ref = self.getStorageRef().child(picturePath);
 
         ref.put(picture).then(function(snapshot) {
-            console.log('Uploaded a blob or file!');
-            callback(picturePath);
+            itemCallback(picturePath);
         });
     };
 
-    this.addPictureToRecipe = function(recipeId, picturePath, callback){
+    this.addPictureToRecipe = function(recipeId, picturePath, itemCallback){
         self.getRecipesCollection().doc(recipeId).get().then(function(doc){
             var recipe = doc.data();
             if (recipe.pictureList != undefined){
@@ -141,11 +148,11 @@ function FirebaseBackend(){
                 recipe.pictureList = [picturePath];
             }
             self.getRecipesCollection().doc(recipeId).set(recipe);
-            callback();
+            itemCallback(doc);
         });
     };
 
-    this.deletePicture = function(recipeId, picturePath, callback){
+    this.deletePicture = function(recipeId, picturePath, itemCallback){
         self.getRecipesCollection().doc(recipeId).get().then(function(doc){
             var recipe = doc.data();
             if (recipe.pictureList != undefined){
@@ -157,13 +164,13 @@ function FirebaseBackend(){
                 });
             }
             self.getRecipesCollection().doc(recipeId).set(recipe);
-            callback();
+            itemCallback(doc);
         });
     };
 
-    this.getPictureUrl = function(picturePath, callback){
+    this.getPictureUrl = function(picturePath, itemCallback){
         self.getStorageRef().child(picturePath).getDownloadURL().then(function(url) {
-            callback(url);
+            itemCallback(url);
         });
     };
 }

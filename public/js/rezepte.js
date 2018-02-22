@@ -46,8 +46,23 @@ function MeineRezepte(){
     };
 
     this.run = function(){
-        self.initiateAplphabet();
-        self.initNewRecipe();
+        var params = new URLSearchParams(window.location.search);
+        if(params.has('recipe')) {
+            self.backend.searchRecipeByTitle(params.get('recipe'), function(doc){
+                var recipeId = doc.id;
+                var title = doc.data().title;
+                self.initiateAlphabet();
+                self.initNewRecipe();
+                self.displayAllRecipesByTitleStart(title[0], recipeId);
+            }, function(){
+                self.initiateAlphabet();
+                self.initNewRecipe();
+            });
+        } else {
+            self.initiateAlphabet();
+            self.initNewRecipe();
+        }
+        new Clipboard('.recipe-link');
     };
 
     this.initTemplates = function(){
@@ -63,24 +78,29 @@ function MeineRezepte(){
         Mustache.parse(self.recipeUpdatePictureRemoveTemplate);
     };
 
-    this.initiateAplphabet = function(titleStart){
-        $('.alphabet-item').removeClass('alphabet-item-active');
-        if (titleStart != undefined){
-            $('.alphabet-item:contains("' + titleStart + '")').addClass('alphabet-item-active');
-        }
-
+    this.initiateAlphabet = function(){
         $('.alphabet-item').addClass('noentries');
-        self.backend.getRecipesTitleStart(function(titles){
-            titles.forEach(function(titleStart){
+        self.backend.getRecipesTitles(function(titles){
+            var titleStartList = $.map(titles, function(e){ return e[0]; });
+            $.unique(titleStartList);
+
+            titleStartList.forEach(function(titleStart){
                 var alphabetItem = $('.alphabet-item:contains("' + titleStart + '")');
                 alphabetItem.removeClass('noentries');
                 alphabetItem.off("click");
                 alphabetItem.on('click', function(){
                     var c = $('span', $(this)).text();
-                    self.displayAllRecipesByTitle(c);
+                    self.displayAllRecipesByTitleStart(c);
                 });
             });
         });
+    };
+
+    this.highlightAlphabetItem = function(titleStart){
+        $('.alphabet-item').removeClass('alphabet-item-active');
+        if (titleStart != undefined){
+            $('.alphabet-item:contains("' + titleStart + '")').addClass('alphabet-item-active');
+        }
     };
 
     this.initNewRecipe = function(){
@@ -106,7 +126,7 @@ function MeineRezepte(){
         $('#recipeNewContainer').append($(self.recipeNewTemplate));
 
         self.initNewRecipe();
-        self.displayAllRecipesByTitle(title[0]);
+        self.displayAllRecipesByTitleStart(title[0]);
     };
 
     this.initNewPicture = function(){
@@ -126,7 +146,7 @@ function MeineRezepte(){
             self.resizeImage(file, pictureArea, function(blob){
                 self.backend.uploadPicture(recipeId, blob, function(picturePath){
                     self.backend.addPictureToRecipe(recipeId, picturePath, function(){
-                        self.displayAllRecipesByTitle(recipeTitle[0], recipeId);
+                        self.displayAllRecipesByTitleStart(recipeTitle[0], recipeId);
                     });
                 });
             });
@@ -184,34 +204,42 @@ function MeineRezepte(){
         };
         reader.readAsDataURL(file); 
         reader.onabort = function() {
-            alert("The upload was aborted.");
+            bootbox.alert("The upload was aborted.");
         }
         reader.onerror = function() {
-            alert("An error occured while reading the file.");
+            bootbox.alert("An error occured while reading the file.");
         }
     };
 
-    this.displayAllRecipesByTitle = function(titleStart, recipeId){
+    this.displayAllRecipesByTitleStart = function(titleStart, recipeId){
         $('#recipesListContainer').empty();
-        if (recipeId != undefined) {
-            self.backend.getRecipesByTitle(titleStart, self.displaySingleRecipe, function(){
+        self.backend.getRecipesByTitle(titleStart, self.displaySingleRecipe, function(){
+            self.highlightAlphabetItem(titleStart);
+            if (recipeId != undefined) {
                 $('#collapseOne-' + recipeId).collapse('show');
-            });
-        } else {
-            self.backend.getRecipesByTitle(titleStart, self.displaySingleRecipe, function(){});
-        }
-        self.initiateAplphabet(titleStart);
+            }
+        });
     };
 
     this.displaySingleRecipe = function(doc){
+        function buildLink(title){
+            var link  = window.location.origin;
+                link += window.location.pathname + '?';
+                link += $.param( {
+                    recipe: title
+                });
+            return link;
+        }
+
         var recipe = doc.data();
         var rendered = $(Mustache.render(self.recipeTemplate, {
             id: doc.id,
             title: recipe.title,
             description: marked(recipe.description),
-            content: marked(recipe.content)
+            content: marked(recipe.content),
+            link: buildLink(recipe.title)
         }));
-        
+
         if (recipe.pictureList != undefined) {
             recipe.pictureList.forEach(function(picturePath) {
                 var img = $('<img src="" class="img-fluid">');
@@ -231,7 +259,7 @@ function MeineRezepte(){
         var recipeId = $(this).attr('data-recipe-id');
         var title = $(this).attr('data-recipe-title');
         self.backend.deleteRecipe(recipeId, function(){
-            self.displayAllRecipesByTitle(title[0]);
+            self.displayAllRecipesByTitleStart(title[0]);
         });
     };
 
@@ -282,7 +310,7 @@ function MeineRezepte(){
 
         title = self.checkTitle(title);
         self.backend.updateRecipe(recipeId, title, description, content, function(){
-            self.displayAllRecipesByTitle(title[0], recipeId);
+            self.displayAllRecipesByTitleStart(title[0], recipeId);
         });
     };
 
@@ -292,13 +320,13 @@ function MeineRezepte(){
         var title = $(this).attr('data-recipe-title');
 
         self.backend.deletePicture(recipeId, picturePath, function(){
-            self.displayAllRecipesByTitle(title[0], recipeId);
+            self.displayAllRecipesByTitleStart(title[0], recipeId);
         });
     };
 
     this.checkTitle = function(title){
         if (isNaN(title.charAt(0)) == false) {
-            alert("Der Titel muss mit einem Grossbuchstaben beginnen.");
+            bootbox.alert("Der Titel muss mit einem Grossbuchstaben beginnen.");
             return;
         }
         return title.charAt(0).toUpperCase() + title.slice(1);
