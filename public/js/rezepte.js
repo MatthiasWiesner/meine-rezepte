@@ -6,8 +6,21 @@ function MeineRezepte(){
         self.backend.init(self);
         self.initTemplates();
 
+        var renderer = new marked.Renderer();
+
+        renderer.listitem = function(text) {
+            if (/^\s*\[[x ]\]\s*/.test(text)) {
+                text = text
+                    .replace(/^\s*\[ \]\s*/, '<input type="checkbox" class="form-check-input" value=""></input> ')
+                    .replace(/^\s*\[x\]\s*/, '<input type="checkbox" class="form-check-input" checked="true" value=""></input> ');
+                return '<li style="list-style: none">' + text + '</li>';
+            } else {
+                return '<li>' + text + '</li>';
+            }
+        };
+
         marked.setOptions({
-            renderer: new marked.Renderer(),
+            renderer: renderer,
             gfm: true,
             tables: true,
             breaks: true,
@@ -16,7 +29,7 @@ function MeineRezepte(){
             smartLists: true,
             smartypants: false,
             xhtml: false
-          });
+        });
     };
 
     this.getEmailPasswort = function(callback){
