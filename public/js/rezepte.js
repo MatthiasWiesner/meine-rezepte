@@ -122,6 +122,16 @@ function MeineRezepte(){
         $('#recipe-new-submit').on('click', self.onRecipeNew);
     };
 
+    this.convertToMarkDownList = function(text) {
+        var mylist = text.split(/\r?\n/);
+        mylist.forEach(function(element, index) {
+            if (element.indexOf('- ') !== 0){
+                mylist[index] = '- ' + element;
+            }
+        });
+        return mylist.join("\n");
+    }
+
     this.onRecipeNew = function(){
         var title = $('#recipe-new-title').val();
 
@@ -131,6 +141,10 @@ function MeineRezepte(){
         }
 
         var description = $('#recipe-new-description').val();
+
+        // Zutatenliste soll immer eine MarkDown Liste sein
+        description = convertToMarkDownList(description);
+
         var content = $('#recipe-new-content').val();
 
         self.backend.addRecipe(title, description, content);
