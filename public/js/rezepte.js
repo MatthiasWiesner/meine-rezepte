@@ -352,7 +352,7 @@ function MeineRezepte(){
                 return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
             };
             title = recipe.title + ' - (copy-id: ' + randomString() + ')';
-            self.backend.addRecipe(title, recipe.description, recipe.content, recipe.pictureList);    
+            self.backend.addRecipe(title, recipe.description, recipe.content);
 
             $('#recipeNewContainer').empty();
             $('#recipeNewContainer').append($(self.recipeNewTemplate));

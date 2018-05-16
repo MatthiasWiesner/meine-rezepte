@@ -81,15 +81,14 @@ function FirebaseBackend(){
         });
     };
 
-    this.addRecipe = function(title, description, content, pictureList){
+    this.addRecipe = function(title, description, content){
         if (title == undefined || title.length == 0) {
             return false;
         }
         self.getRecipesCollection().add({
             title: title,
             description: description,
-            content: content,
-            pictureList: pictureList || []
+            content: content
         });
     };
 
