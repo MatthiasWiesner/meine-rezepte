@@ -96,7 +96,10 @@
             <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne-{{ id }}" aria-expanded="false" aria-controls="collapseOne">{{ title }}</button>
             <button title="Rezept löschen" class="recipe-remove btn btn-link float-right fa fa-trash" data-recipe-id="{{ id }}" data-recipe-title="{{ title }}"></button>
             <button title="Rezept editieren" class="recipe-edit btn btn-link float-right fa fa-edit" data-recipe-id="{{ id }}" data-recipe-title="{{ title }}"></button>
-            <button title="Rezept-Link kopieren" class="recipe-link btn btn-link float-right fa fa-clipboard" data-clipboard-text="{{ link }}"></button>
+            <button title="Rezept klonen" class="recipe-clone btn btn-link float-right fa fa-clone" data-recipe-id="{{ id }}" data-recipe-title="{{ title }}"></button>
+
+            <!-- This functionality is unused -->
+            <!-- <button title="Rezept-Link kopieren" class="recipe-link btn btn-link float-right fa fa-clipboard" data-clipboard-text="{{ link }}"></button> -->
         </h5>
     </div>
     <div id="collapseOne-{{ id }}" class="collapse" aria-labelledby="recipe-{{ id }}" data-parent="#recipesListContainer">

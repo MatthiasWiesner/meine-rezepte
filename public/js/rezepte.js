@@ -278,6 +278,7 @@ function MeineRezepte(){
         $('#recipesListContainer').append(rendered);
         $('.recipe-remove', rendered).on('click', self.onRecipeRemove);
         $('.recipe-edit', rendered).on('click', self.onRecipeEdit);
+        $('.recipe-clone', rendered).on('click', self.onRecipeClone);
     };
 
     this.onRecipeRemove = function(){
@@ -338,6 +339,26 @@ function MeineRezepte(){
         title = self.checkTitle(title);
         self.backend.updateRecipe(recipeId, title, description, content, function(){
             self.displayAllRecipesByTitleStart(title[0], recipeId);
+        });
+    };
+
+    this.onRecipeClone = function(){
+        var recipeId = $(this).attr('data-recipe-id');
+
+        self.backend.getRecipe(recipeId, function(doc){
+            var recipe = doc.data();
+    
+            var randomString = function(){
+                return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
+            };
+            title = recipe.title + ' - (copy-id: ' + randomString() + ')';
+            self.backend.addRecipe(title, recipe.description, recipe.content, recipe.pictureList);    
+
+            $('#recipeNewContainer').empty();
+            $('#recipeNewContainer').append($(self.recipeNewTemplate));
+    
+            self.initNewRecipe();
+            self.displayAllRecipesByTitleStart(title[0]);
         });
     };
 
