@@ -141,10 +141,8 @@ function MeineRezepte(){
         }
 
         var description = $('#recipe-new-description').val();
-
         // Zutatenliste soll immer eine MarkDown Liste sein
-        description = convertToMarkDownList(description);
-
+        description = self.convertToMarkDownList(description);
         var content = $('#recipe-new-content').val();
 
         self.backend.addRecipe(title, description, content);
@@ -333,6 +331,8 @@ function MeineRezepte(){
     this.onRecipeUpdate = function(recipeId){
         var title = $('.recipe-update-title', $('#collapseOne-' + recipeId)).val();
         var description = $('.recipe-update-description', $('#collapseOne-' + recipeId)).val();
+        // Zutatenliste soll immer eine MarkDown Liste sein
+        description = self.convertToMarkDownList(description);
         var content = $('.recipe-update-content', $('#collapseOne-' + recipeId)).val();
 
         title = self.checkTitle(title);
