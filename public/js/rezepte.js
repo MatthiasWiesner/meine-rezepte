@@ -124,11 +124,15 @@ function MeineRezepte(){
 
     this.convertToMarkDownList = function(text) {
         var mylist = text.split(/\r?\n/);
-        mylist.forEach(function(element, index) {
-            if (element.indexOf('- ') !== 0){
-                mylist[index] = '- ' + element;
+        for (var i = 0; i < mylist.length; i++) {
+            var element = mylist[i];
+            if (element.length == 0) {
+                break;
             }
-        });
+            if (element.indexOf('- ') !== 0){
+                mylist[i] = '- ' + element;
+            }
+        }
         return mylist.join("\n");
     }
 
