@@ -2,17 +2,15 @@ function MeineRezepte(){
     self = this;
 
     this.init = function(){
-        self.backend = new FirebaseBackend();
-        self.backend.init(self);
-        self.initTemplates();
-
+        self.initTemplates();        
+        
         var renderer = new marked.Renderer();
 
         renderer.listitem = function(text) {
             if (/^\s*\[[x ]\]\s*/.test(text)) {
                 text = text
-                    .replace(/^\s*\[ \]\s*/, '<input type="checkbox" class="form-check-input" value=""></input> ')
-                    .replace(/^\s*\[x\]\s*/, '<input type="checkbox" class="form-check-input" checked="true" value=""></input> ');
+                .replace(/^\s*\[ \]\s*/, '<input type="checkbox" class="form-check-input" value=""></input> ')
+                .replace(/^\s*\[x\]\s*/, '<input type="checkbox" class="form-check-input" checked="true" value=""></input> ');
                 return '<li style="list-style: none">' + text + '</li>';
             } else {
                 return '<li>' + text + '</li>';
@@ -30,6 +28,9 @@ function MeineRezepte(){
             smartypants: false,
             xhtml: false
         });
+
+        self.backend = new SinatraBackend();
+        self.backend.init(self);
     };
 
     this.getEmailPasswort = function(callback){
@@ -61,9 +62,9 @@ function MeineRezepte(){
     this.run = function(){
         var params = new URLSearchParams(window.location.search);
         if(params.has('recipe')) {
-            self.backend.searchRecipeByTitle(params.get('recipe'), function(doc){
-                var recipeId = doc.id;
-                var title = doc.data().title;
+            self.backend.searchRecipeByTitle(params.get('recipe'), function(recipe){
+                var recipeId = recipe.id;
+                var title = recipe.title;
                 self.initiateAlphabet();
                 self.initNewRecipe();
                 $('#recipes-export').on('click', self.onExportRecipes);
@@ -155,13 +156,14 @@ function MeineRezepte(){
         description = self.convertToMarkDownList(description);
         var content = $('#recipe-new-content').val();
 
-        self.backend.addRecipe(title, description, content);
-
-        $('#recipeNewContainer').empty();
-        $('#recipeNewContainer').append($(self.recipeNewTemplate));
-
-        self.initNewRecipe();
-        self.displayAllRecipesByTitleStart(title[0]);
+        self.backend.addRecipe(title, description, content, function(recipe){
+            $('#recipeNewContainer').empty();
+            $('#recipeNewContainer').append($(self.recipeNewTemplate));
+    
+            self.initNewRecipe();
+            self.initiateAlphabet();
+            self.displayAllRecipesByTitleStart(title[0], recipe.id);
+        });
     };
 
     this.initNewPicture = function(){
@@ -179,10 +181,8 @@ function MeineRezepte(){
         var file = event.target.files[0];
         if (file.type.match('image.*')) {
             self.resizeImage(file, pictureArea, function(blob){
-                self.backend.uploadPicture(recipeId, blob, function(picturePath){
-                    self.backend.addPictureToRecipe(recipeId, picturePath, function(){
-                        self.displayAllRecipesByTitleStart(recipeTitle[0], recipeId);
-                    });
+                self.backend.uploadPicture(recipeId, blob, function(){
+                    self.displayAllRecipesByTitleStart(recipeTitle[0], recipeId);
                 });
             });
         } else {
@@ -256,7 +256,7 @@ function MeineRezepte(){
         });
     };
 
-    this.displaySingleRecipe = function(doc){
+    this.displaySingleRecipe = function(recipe){
         function buildLink(title){
             var link  = window.location.origin;
                 link += window.location.pathname + '?';
@@ -266,9 +266,8 @@ function MeineRezepte(){
             return link;
         }
 
-        var recipe = doc.data();
         var rendered = $(Mustache.render(self.recipeTemplate, {
-            id: doc.id,
+            id: recipe.id,
             title: recipe.title,
             description: marked(recipe.description),
             content: marked(recipe.content),
@@ -279,9 +278,7 @@ function MeineRezepte(){
             recipe.pictureList.forEach(function(picturePath) {
                 var img = $('<img src="" class="img-fluid">');
                 $('.pictureList', rendered).append(img);
-                self.backend.getPictureUrl(picturePath, function(url){
-                    img.attr('src', url);
-                });
+                img.attr('src', picturePath);
             });
         }
 
@@ -295,6 +292,7 @@ function MeineRezepte(){
         var recipeId = $(this).attr('data-recipe-id');
         var title = $(this).attr('data-recipe-title');
         self.backend.deleteRecipe(recipeId, function(){
+            self.initiateAlphabet();
             self.displayAllRecipesByTitleStart(title[0]);
         });
     };
@@ -302,10 +300,9 @@ function MeineRezepte(){
     this.onRecipeEdit = function(){
         var recipeId = $(this).attr('data-recipe-id');
 
-        self.backend.getRecipe(recipeId, function(doc){
-            var recipe = doc.data();
+        self.backend.getRecipe(recipeId, function(recipe){
             var rendered = $(Mustache.render(self.recipeUpdateTemplate, {
-                id: doc.id,
+                id: recipe.id,
                 title: recipe.title,
                 description: recipe.description,
                 content: recipe.content
@@ -314,17 +311,14 @@ function MeineRezepte(){
             if (recipe.pictureList != undefined) {
                 recipe.pictureList.forEach(function(picturePath) {
                     var pic = $(Mustache.render(self.recipeUpdatePictureRemoveTemplate, {
-                        id: doc.id,
+                        id: recipe.id,
                         title: recipe.title,
                         picturePath: picturePath,
                         url: ''
                     }));
                     $('.pictureList', rendered).append(pic);
                     $('.picture-remove', pic).on('click', self.onPictureRemove);
-
-                    self.backend.getPictureUrl(picturePath, function(url){
-                        $('img', pic).attr('src', url);
-                    });
+                    $('img', pic).attr('src', picturePath);
                 });
             }
 
@@ -355,20 +349,19 @@ function MeineRezepte(){
     this.onRecipeClone = function(){
         var recipeId = $(this).attr('data-recipe-id');
 
-        self.backend.getRecipe(recipeId, function(doc){
-            var recipe = doc.data();
-    
+        self.backend.getRecipe(recipeId, function(recipe){
             var randomString = function(){
                 return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
             };
             title = recipe.title + ' - (copy-id: ' + randomString() + ')';
-            self.backend.addRecipe(title, recipe.description, recipe.content);
-
-            $('#recipeNewContainer').empty();
-            $('#recipeNewContainer').append($(self.recipeNewTemplate));
-    
-            self.initNewRecipe();
-            self.displayAllRecipesByTitleStart(title[0]);
+            self.backend.addRecipe(title, recipe.description, recipe.content, function(recipe){
+                $('#recipeNewContainer').empty();
+                $('#recipeNewContainer').append($(self.recipeNewTemplate));
+        
+                self.initNewRecipe();
+                self.initiateAlphabet();
+                self.displayAllRecipesByTitleStart(title[0], recipe.id);
+            });
         });
     };
 
