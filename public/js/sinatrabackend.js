@@ -65,6 +65,12 @@ function SinatraBackend(){
         });
     };
 
+    this.exportRecipes = function(finishedCallback){
+        self.sendRequest('GET', '/recipe/', function(data){
+            finishedCallback(data);
+        });
+    };
+
     this.getRecipesTitles = function(finishedCallback){
         var titles = new Array();
         self.sendRequest('GET', '/recipe/', function(data){
