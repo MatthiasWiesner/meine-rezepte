@@ -43,6 +43,16 @@ function FirebaseBackend(){
         return self.storage.ref();
     };
 
+    this.exportRecipes = function(finishedCallback){
+        var recipes = new Array();
+        self.getRecipesCollection().get().then(function(querySnapshot){
+            querySnapshot.forEach(function(doc){
+                recipes.push(doc.data());
+            });
+            finishedCallback(recipes);
+        });
+    };
+
     this.getRecipesTitles = function(finishedCallback){
         var titles = new Array();
         self.getRecipesCollection().get().then(function(querySnapshot){

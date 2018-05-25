@@ -376,6 +376,21 @@ function MeineRezepte(){
         });
     };
 
+    this.exportRecipes = function(){
+        self.backend.exportRecipes(function(recipes){
+            var json = JSON.stringify(recipes, null, 2);
+            var blob = new Blob([json], {type: 'application/json'});
+            var url = window.URL.createObjectURL(blob);
+            var a = $("<a />", {
+                href : url,
+                download: 'export_recipes.json'
+            });
+            a.appendTo('body');
+            a.simulate("click");
+            window.URL.revokeObjectURL(url);            
+        });
+    };
+
     this.checkTitle = function(title){
         if (isNaN(title.charAt(0)) == false) {
             bootbox.alert("Der Titel muss mit einem Grossbuchstaben beginnen.");
