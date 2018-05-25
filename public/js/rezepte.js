@@ -66,17 +66,20 @@ function MeineRezepte(){
                 var title = doc.data().title;
                 self.initiateAlphabet();
                 self.initNewRecipe();
-                $('#recipes-export').on('click', self.exportRecipes);
+                $('#recipes-export').on('click', self.onExportRecipes);
+                $('#recipes-import').on('click', self.onImportRecipes);
                 self.displayAllRecipesByTitleStart(title[0], recipeId);
             }, function(){
                 self.initiateAlphabet();
                 self.initNewRecipe();
-                $('#recipes-export').on('click', self.exportRecipes);
+                $('#recipes-export').on('click', self.onExportRecipes);
+                $('#recipes-import').on('click', self.onImportRecipes);
             });
         } else {
             self.initiateAlphabet();
             self.initNewRecipe();
-            $('#recipes-export').on('click', self.exportRecipes);
+            $('#recipes-export').on('click', self.onExportRecipes);
+            $('#recipes-import').on('click', self.onImportRecipes);
         }
         new Clipboard('.recipe-link');
     };
@@ -379,19 +382,51 @@ function MeineRezepte(){
         });
     };
 
-    this.exportRecipes = function(){
+    this.onExportRecipes = function(){
         self.backend.exportRecipes(function(recipes){
             var json = JSON.stringify(recipes, null, 2);
             var blob = new Blob([json], {type: 'application/json'});
             var url = window.URL.createObjectURL(blob);
-            var a = $("<a />", {
-                href : url,
-                download: 'export_recipes.json'
-            });
-            a.appendTo('body');
-            a.trigger("click");
-            window.URL.revokeObjectURL(url);            
+
+            var a = document.createElement("a");
+            if (typeof a.download === 'undefined') {
+                window.location = url;
+            } else {
+                a.href = url;
+                a.download = 'export_recipes.json';
+                document.body.appendChild(a);
+                a.click();
+            }
+            window.URL.revokeObjectURL(url);
         });
+    };
+
+    this.onImportRecipes = function(){
+        var b = bootbox.dialog({
+            title: 'Import Secrets',
+            message: $('#tplImportSecrets').html()
+        });
+
+        $('#btnSaveImports', b).on('click', $.proxy(function(){
+            try {
+                var data = JSON.parse($('#content', b).val());
+            } catch (err) {
+                alert('The data could not be parsed. Please insert valid json');
+                return false;
+            }
+            data.forEach(function(recipe){
+                title = self.checkTitle(recipe.title);
+                if (title == undefined) {
+                    return false;
+                }
+                // Zutatenliste soll immer eine MarkDown Liste sein
+                description = self.convertToMarkDownList(recipe.description);
+                self.backend.addRecipe(title, description, recipe.content);    
+            });
+            $('#recipeNewContainer').empty();
+            $('#recipeNewContainer').append($(self.recipeNewTemplate));
+            self.initiateAlphabet();
+        }, this));
     };
 
     this.checkTitle = function(title){
