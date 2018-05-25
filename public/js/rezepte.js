@@ -66,14 +66,17 @@ function MeineRezepte(){
                 var title = doc.data().title;
                 self.initiateAlphabet();
                 self.initNewRecipe();
+                $('#recipes-export').on('click', self.exportRecipes);
                 self.displayAllRecipesByTitleStart(title[0], recipeId);
             }, function(){
                 self.initiateAlphabet();
                 self.initNewRecipe();
+                $('#recipes-export').on('click', self.exportRecipes);
             });
         } else {
             self.initiateAlphabet();
             self.initNewRecipe();
+            $('#recipes-export').on('click', self.exportRecipes);
         }
         new Clipboard('.recipe-link');
     };
