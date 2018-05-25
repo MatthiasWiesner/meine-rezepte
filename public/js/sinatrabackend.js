@@ -24,6 +24,7 @@ function SinatraBackend(){
         var options = {
             method: method,
             url: self.config.endpoint + path,
+            crossDomain: true,
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('Authorization', 'Basic ' + btoa($.session.get('email') + ':' + $.session.get('password')));
             },
@@ -36,13 +37,11 @@ function SinatraBackend(){
             options = {...options, ...addional_options};
         }
 
-        $.ajax(options).fail(function(error, a, b) {
+        $.ajax(options).fail(function(error) {
             if (typeof error_callback === "function") {
                 error_callback();
             } else {
                 console.log(error);
-                console.log(a);
-                console.log(b);
                 bootbox.alert("An error occured: " + error.status + ' ' + error.statusText);
             }
         });
