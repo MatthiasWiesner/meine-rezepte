@@ -403,7 +403,7 @@ function MeineRezepte(){
         $('#btnSaveImports', b).on('click', $.proxy(function(){
             try {
                 var data = JSON.parse($('#content', b).val());
-            } catch (err) {
+            } catch (err) {q
                 alert('The data could not be parsed. Please insert valid json');
                 return false;
             }
@@ -414,7 +414,7 @@ function MeineRezepte(){
                 }
                 // Zutatenliste soll immer eine MarkDown Liste sein
                 description = self.convertToMarkDownList(recipe.description);
-                self.backend.addRecipe(title, description, recipe.content);    
+                self.backend.addRecipe(title, description, recipe.content, function(){});    
             });
             $('#recipeNewContainer').empty();
             $('#recipeNewContainer').append($(self.recipeNewTemplate));
