@@ -389,7 +389,7 @@ function MeineRezepte(){
                 download: 'export_recipes.json'
             });
             a.appendTo('body');
-            a.simulate("click");
+            a.trigger("click");
             window.URL.revokeObjectURL(url);            
         });
     };
