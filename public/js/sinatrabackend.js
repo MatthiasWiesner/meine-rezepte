@@ -4,9 +4,8 @@ function SinatraBackend(){
 
     this.init = function(app){
         if (typeof(config) == 'undefined') {
-            msg  = "You need the firebase config. Create a file 'public/js/config.js'.\n"
-            msg += "Get the config from the firebase app overview (Add firebase to web-app).\n"
-            msg += "Paste the config variable to the file."
+            msg  = "You need the config. Create a file 'public/js/config.js'.\n"
+            msg += "And add the endpoint to the sinatra backend.\n"
             bootbox.alert(msg);
         } else {
             self.config = config;
