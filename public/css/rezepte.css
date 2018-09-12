@@ -53,9 +53,9 @@ body {
 
 /* recipe list */
 
-#recipeList .card-header {
+.card-header {
     height: 35px; 
-    padding-top: 0px;
+    padding: 0px;
 }
 
 #recipesListContainer, #recipeNewContainer {
@@ -97,11 +97,6 @@ body {
 }
 .recipe .pictureList .pictureUpdate {
     width: fit-content;
-}
-
-.card-header {
-    height: 35px; 
-    padding-top: 0px;
 }
 
 #recipeNew button {

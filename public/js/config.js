@@ -1,3 +1,3 @@
 var config = {
-    "endpoint": "http://localhost:9292",
+    "endpoint": "http://localhost:9292"
 }
