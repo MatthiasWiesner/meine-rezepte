@@ -434,8 +434,8 @@ function MeineRezepte(){
     };
 
     this.onSignOut = function(){
-        $.cookie('email', null);
-        $.cookie('password', null);
+        $.cookie('email', null, {expires: -1});
+        $.cookie('password', null, {expires: -1});
         window.location.href = window.location.protocol + "//" + window.location.host + "/";
     }
 
