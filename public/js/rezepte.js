@@ -266,12 +266,20 @@ function MeineRezepte(){
             return link;
         }
 
+        function getAuthor() {
+            if (recipe.author != undefined) {
+                return recipe.author.email.split('@')[0];
+            }
+            return '';
+        }
+
         var rendered = $(Mustache.render(self.recipeTemplate, {
             id: recipe.id,
             title: recipe.title,
             description: marked(recipe.description),
             content: marked(recipe.content),
-            link: buildLink(recipe.title)
+            link: buildLink(recipe.title),
+            author: getAuthor()
         }));
 
         if (recipe.pictureList != undefined) {

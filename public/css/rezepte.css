@@ -4,15 +4,13 @@ body {
     overflow-y: scroll;
 }
 
-.slick-prev:before,
-.slick-next:before {
-  color: #ccc;
-}
+/* alphabet */
 
 .alphabet {
     margin: 0 auto;
     margin-bottom: 20px;
 }
+
 .alphabet-item {
     height: 30px;
     border-radius: 5px;
@@ -27,10 +25,6 @@ body {
     background-color: rgb(250, 250, 250);
     color: darkgray;
     cursor: default;
-}
-
-.slick-slide {
-    outline: none !important;
 }
 
 .alphabet-item-active {
@@ -56,6 +50,12 @@ body {
 .card-header {
     height: 35px; 
     padding: 0px;
+}
+
+.card-header .author {
+    font-size: 60%;
+    font-style: italic;
+    color: gray;
 }
 
 #recipesListContainer, #recipeNewContainer {
@@ -86,7 +86,6 @@ body {
 .recipe-update-pictures-container h6 {
     border-bottom: 1px dashed silver;
 }
-
 
 .recipe .pictureList img {
     margin-top: 10px;
