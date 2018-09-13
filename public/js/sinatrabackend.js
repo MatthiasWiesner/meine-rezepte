@@ -9,7 +9,7 @@ function SinatraBackend(){
             bootbox.alert(msg);
         } else {
             self.config = config;
-            if (!$.session.get('email')){
+            if (!$.cookie('email')){
                 app.getEmailPasswort(function(email, password){
                     self.login(email, password, app.run);
                 });
@@ -25,7 +25,7 @@ function SinatraBackend(){
             url: self.config.endpoint + path,
             crossDomain: true,
             beforeSend: function(xhr) {
-                xhr.setRequestHeader('Authorization', 'Basic ' + btoa($.session.get('email') + ':' + $.session.get('password')));
+                xhr.setRequestHeader('Authorization', 'Basic ' + btoa($.cookie('email') + ':' + $.cookie('password')));
             },
             success: success_callback
         };
@@ -54,8 +54,8 @@ function SinatraBackend(){
                 xhr.setRequestHeader('Authorization', 'Basic ' + btoa(email + ':' + password));
             },
             success: function(data, state, xhr){
-                $.session.set('email', email);
-                $.session.set('password', password);
+                $.cookie('email', email, {expires: 365});
+                $.cookie('password', password, {expires: 365});
                 callback();
             }
         })

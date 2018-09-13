@@ -69,18 +69,21 @@ function MeineRezepte(){
                 self.initNewRecipe();
                 $('#recipes-export').on('click', self.onExportRecipes);
                 $('#recipes-import').on('click', self.onImportRecipes);
+                $('#sign-out').on('click', self.onSignOut);
                 self.displayAllRecipesByTitleStart(title[0], recipeId);
             }, function(){
                 self.initiateAlphabet();
                 self.initNewRecipe();
                 $('#recipes-export').on('click', self.onExportRecipes);
                 $('#recipes-import').on('click', self.onImportRecipes);
+                $('#sign-out').on('click', self.onSignOut);
             });
         } else {
             self.initiateAlphabet();
             self.initNewRecipe();
             $('#recipes-export').on('click', self.onExportRecipes);
             $('#recipes-import').on('click', self.onImportRecipes);
+            $('#sign-out').on('click', self.onSignOut);
         }
         new Clipboard('.recipe-link');
     };
@@ -429,6 +432,12 @@ function MeineRezepte(){
             self.initiateAlphabet();
         }, this));
     };
+
+    this.onSignOut = function(){
+        $.cookie('email', null);
+        $.cookie('password', null);
+        window.location.href = window.location.protocol + "//" + window.location.host + "/";
+    }
 
     this.checkTitle = function(title){
         if (isNaN(title.charAt(0)) == false) {
