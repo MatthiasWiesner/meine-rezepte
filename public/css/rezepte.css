@@ -94,12 +94,11 @@ body {
 }
 
 .recipe .pictureList {
-    display: flex;
+    text-align: center;
 }
 .recipe .pictureList img {
     margin-top: 10px;
-    margin-left: auto;
-    margin-right: auto;
+    margin-right: 10px;
     border: 1px inset #ddd;
     padding: 5px;
     background-color: silver;
