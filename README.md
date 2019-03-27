@@ -1,4 +1,6 @@
 # Rezepte
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FMatthiasWiesner%2Fmeine-rezepte.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FMatthiasWiesner%2Fmeine-rezepte?ref=badge_shield)
+
 
 ## Installation
 
@@ -64,3 +66,7 @@ Wenn das ferig ist:
 - `firebase login`
 - `firebase init`
 - `firebase deploy`
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FMatthiasWiesner%2Fmeine-rezepte.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FMatthiasWiesner%2Fmeine-rezepte?ref=badge_large)
