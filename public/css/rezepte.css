@@ -167,3 +167,16 @@ body {
     border: none;
     color: grey;
 }
+
+.recipe-title {
+    max-width: 360px;
+    overflow: hidden;
+}
+
+.recipe-link,
+.recipe-remove,
+.recipe-clone,
+.recipe-edit {
+    padding: 3px;
+    margin-top: 2px;
+}
