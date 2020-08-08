@@ -62,7 +62,8 @@ body {
     font-size: 60%;
     font-style: italic;
     color: gray;
-    line-height: 40px;
+    line-height: 35px;
+    margin-right: 10px;
 }
 
 #recipesListContainer, #recipeNewContainer {
