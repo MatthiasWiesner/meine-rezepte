@@ -102,15 +102,12 @@
 <div class="card recipe">
     <div class="card-header" id="recipe-{{ id }}" data-toggle="collapse" data-target="#collapseOne-{{ id }}" aria-expanded="false" aria-controls="collapseOne">
         <h5 class="mb-0">
-            <button class="btn btn-link float-left">{{ title }}</button>
+            <button class="recipe-title btn btn-link float-left">{{ title }}</button>
             <span class="author d-none d-sm-block float-left">{{ author }}</span>
             <button title="Rezept-Link kopieren" class="recipe-link btn btn-link float-right fa fa-clipboard d-none d-sm-block" data-clipboard-text="{{ link }}"></button>
             <button title="Rezept löschen" class="recipe-remove btn btn-link float-right fa fa-trash" data-recipe-id="{{ id }}" data-recipe-title="{{ title }}"></button>
-            <button title="Rezept klonen" class="recipe-clone btn btn-link float-right fa fa-clone d-none d-sm-block" data-recipe-id="{{ id }}" data-recipe-title="{{ title }}"></button>
+            <button title="Rezept klonen" class="recipe-clone btn btn-link float-right fa fa-clone" data-recipe-id="{{ id }}" data-recipe-title="{{ title }}"></button>
             <button title="Rezept editieren" class="recipe-edit btn btn-link float-right fa fa-edit" data-recipe-id="{{ id }}" data-recipe-title="{{ title }}"></button>
-
-            <!-- This functionality is unused -->
-            <!-- <button title="Rezept-Link kopieren" class="recipe-link btn btn-link float-right fa fa-clipboard" data-clipboard-text="{{ link }}"></button> -->
         </h5>
     </div>
     <div id="collapseOne-{{ id }}" class="collapse" aria-labelledby="recipe-{{ id }}" data-parent="#recipesListContainer">
