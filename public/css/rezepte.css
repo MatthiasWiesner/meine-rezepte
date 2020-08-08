@@ -173,8 +173,9 @@ body {
 }
 
 .recipe-title {
-    max-width: 360px;
+    width: 70%;
     overflow: hidden;
+    text-align: left;
 }
 
 .recipe-link,
