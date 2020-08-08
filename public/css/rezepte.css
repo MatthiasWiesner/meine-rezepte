@@ -175,6 +175,7 @@ body {
 
 .recipe-header {
     display: flex;
+    justify-content: space-between;
 }
 
 .recipe-title {
