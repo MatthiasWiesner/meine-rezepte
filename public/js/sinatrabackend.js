@@ -64,97 +64,87 @@ function SinatraBackend(){
         });
     };
 
-    this.exportRecipes = function(finishedCallback){
-        self.sendRequest('GET', '/recipe/', function(data){
-            finishedCallback(data);
-        });
+    this.exportRecipes = function(callback){
+        self.sendRequest('GET', '/recipe/', callback);
     };
 
-    this.getRecipesTitles = function(finishedCallback){
+    this.getRecipesTitles = function(callback){
         var titles = new Array();
         self.sendRequest('GET', '/recipe/', function(data){
             data.forEach(function(recipe){
                 titles.push(recipe.title);
             });
-            finishedCallback(titles);
+            callback(titles);
         });
     };
 
-    this.getRecipesByTitle = function(titleStartWith, itemCallback, finishedCallback){
-        self.sendRequest('GET', '/recipe/?titleStart=' + titleStartWith, function(data){
-            data.forEach(function(recipe){
-                itemCallback(recipe);
-            });
-            finishedCallback();
-        });
+    this.getRecipesByTitle = function(titleStartWith, callback){
+        self.sendRequest('GET', '/recipe/?titleStart=' + titleStartWith, callback);
     };
 
-    this.searchRecipeByTitle = function(title, itemCallback, notFoundCallback){
+    this.getRecipesByTag = function(tagId, callback){
+        self.sendRequest('GET', '/tag/' + tagId, callback);
+    };
+
+    this.searchRecipeByTitle = function(title, callback, notFoundCallback){
         self.sendRequest('GET', '/recipe/?title=' + btoa(title), function(recipe){
             if (recipe) {
-                itemCallback(recipe);
+                callback(recipe);
             } else {
                 notFoundCallback();
             }
         });
     }
 
-    this.getRecipe = function(recipeId, itemCallback){
-        self.sendRequest('GET', '/recipe/' + recipeId, function(recipe){
-            itemCallback(recipe);
-        });
+    this.getRecipe = function(recipeId, callback){
+        self.sendRequest('GET', '/recipe/' + recipeId, callback);
     };
 
-    this.addRecipe = function(title, description, content, itemCallback){
+    this.addRecipe = function(title, description, content, tagList, callback){
         if (title == undefined || title.length == 0) {
             return false;
         }
         var data = {
             'title': title,
             'description': description,
-            'content': content
+            'content': content,
+            'tagList': tagList
         }
-        self.sendRequest('POST', '/recipe/', function(recipe){
-            itemCallback(recipe);
-        }, data);
+        self.sendRequest('POST', '/recipe/', callback, data);
     };
 
-    this.updateRecipe = function(recipeId, title, description, content, itemCallback){
+    this.updateRecipe = function(recipeId, title, description, content, tagList, callback){
         if (title == undefined || title.length == 0) {
             return false;
         }
         var data = {
             'title': title,
             'description': description,
-            'content': content
+            'content': content,
+            'tagList': tagList
         }
-        self.sendRequest('PUT', '/recipe/' + recipeId, function(recipe){
-            itemCallback(recipe);
-        }, data);
+        self.sendRequest('PUT', '/recipe/' + recipeId, callback, data);
     };
 
-    this.deleteRecipe = function(recipeId, itemCallback){
-        self.sendRequest('DELETE', '/recipe/' + recipeId, function(recipe){
-            itemCallback(recipe);
-        });
+    this.deleteRecipe = function(recipeId, callback){
+        self.sendRequest('DELETE', '/recipe/' + recipeId, callback);
     }
 
-    this.uploadPicture = function(recipeId, picture, itemCallback){
+    this.uploadPicture = function(recipeId, picture, callback){
         var fd = new FormData();
         fd.append('upload', picture, 'picture');
         options = {
             processData: false,
             contentType: false
         }
-
-        self.sendRequest('POST', '/recipe/' + recipeId + '/picture', function(recipe){
-            itemCallback(recipe);
-        }, fd, options);
+        self.sendRequest('POST', '/recipe/' + recipeId + '/picture', callback, fd, options);
     };
 
-    this.deletePicture = function(recipeId, picturePath, itemCallback){
-        self.sendRequest('DELETE', '/recipe/' + recipeId + '/picture/' + btoa(picturePath), function(recipe){
-            itemCallback(recipe);
-        });
+    this.deletePicture = function(recipeId, picturePath, callback){
+        self.sendRequest('DELETE', '/recipe/' + recipeId + '/picture/' + btoa(picturePath), callback);
+    };
+
+     this.getTagList = function(callback){
+        self.sendRequest('GET', '/tag/?', callback);
     };
 }

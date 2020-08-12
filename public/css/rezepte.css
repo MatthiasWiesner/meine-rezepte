@@ -78,20 +78,22 @@ body {
 .recipe-description-container,
 .recipe-content-container, 
 .recipe-pictures-container,
-.recipe-update-title-container, 
-.recipe-update-description-container, 
-.recipe-update-content-container, 
-.recipe-update-pictures-container {
+.recipe-title-container, 
+.recipe-description-container, 
+.recipe-content-container,
+.recipe-tags-container,
+.recipe-pictures-container {
     margin-bottom: 30px;
 }
 
 .recipe-description-container h6, 
 .recipe-content-container h6, 
 .recipe-pictures-container h6,
-.recipe-update-title-container h6, 
-.recipe-update-description-container h6, 
-.recipe-update-content-container h6, 
-.recipe-update-pictures-container h6 {
+.recipe-title-container h6, 
+.recipe-description-container h6, 
+.recipe-content-container h6,
+.recipe-tags-container h6, 
+.recipe-pictures-container h6 {
     border-bottom: 1px dashed silver;
 }
 
@@ -204,4 +206,33 @@ body {
 .recipe-edit {
     padding: 3px;
     margin-top: 3px;
+}
+
+.tagsListContainer {
+    list-style-type: none;
+    padding: 0;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    height: 30px;
+    display: flex;
+    overflow-y: auto;
+    align-items: baseline;
+}
+
+.tag-list-item {
+    border-radius: 5px;
+    border: 1px solid grey;
+    cursor: pointer;
+    margin-right: 5px;
+    float: left;
+    padding: 3px;
+    color: #495057;
+    background-color: rgb(250, 250, 250);
+    font-size: small;
+    font-style: oblique;
+}
+
+.tag-list-item.active {
+    background-color: rgb(101, 150, 255);
+    color: white;
 }

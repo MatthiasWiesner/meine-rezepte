@@ -66,6 +66,7 @@ function MeineRezepte(){
                 var recipeId = recipe.id;
                 var title = recipe.title;
                 self.initiateAlphabet();
+                self.initiateTagList();
                 self.initNewRecipe();
                 $('#recipes-export').on('click', self.onExportRecipes);
                 $('#recipes-import').on('click', self.onImportRecipes);
@@ -73,6 +74,7 @@ function MeineRezepte(){
                 self.displayAllRecipesByTitleStart(title[0], recipeId);
             }, function(){
                 self.initiateAlphabet();
+                self.initiateTagList();
                 self.initNewRecipe();
                 $('#recipes-export').on('click', self.onExportRecipes);
                 $('#recipes-import').on('click', self.onImportRecipes);
@@ -80,6 +82,7 @@ function MeineRezepte(){
             });
         } else {
             self.initiateAlphabet();
+            self.initiateTagList();
             self.initNewRecipe();
             $('#recipes-export').on('click', self.onExportRecipes);
             $('#recipes-import').on('click', self.onImportRecipes);
@@ -93,12 +96,15 @@ function MeineRezepte(){
         Mustache.parse(self.recipeTemplate);
 
         self.recipeNewTemplate = $('#recipe-new-template').html();
-
+        
         self.recipeUpdateTemplate = $('#recipe-update-template').html();
+        self.recipeUpdateTaglistTemplate = $('#recipe-update-taglist-template').html();
         Mustache.parse(self.recipeUpdateTemplate);
 
         self.recipeUpdatePictureRemoveTemplate = $('#recipe-update-picture-remove-template').html();
         Mustache.parse(self.recipeUpdatePictureRemoveTemplate);
+
+        self.tagTemplate = $('#tag-template').html();
     };
 
     this.initiateAlphabet = function(){
@@ -119,6 +125,18 @@ function MeineRezepte(){
         });
     };
 
+    this.initiateTagList = function(){
+        $('#tagsListContainer').empty();
+        self.backend.getTagList(function(tags){
+            tags.forEach(function(tag){
+                var rendered = $(Mustache.render(self.tagTemplate, {name: tag.name, id: tag.id}));
+                rendered.removeClass('active');
+                $('#tagsListContainer').append(rendered);
+                $('.tag-list-item-link', rendered).on('click', self.displayAllRecipesByTagFilter);
+            });
+        });
+    }
+
     this.highlightAlphabetItem = function(titleStart){
         $('.alphabet-item').removeClass('alphabet-item-active');
         if (titleStart != undefined){
@@ -128,8 +146,21 @@ function MeineRezepte(){
 
     this.initNewRecipe = function(){
         $('#recipeNewContainer').empty();
-        $('#recipeNewContainer').append($(self.recipeNewTemplate));
-        $('#recipe-new-submit').on('click', self.onRecipeNew);
+
+        var renderData = {tagList: ""};
+        self.backend.getTagList(function(tags){
+            tags.forEach(function(tag){
+                var data = {
+                    tag_id: tag.id,
+                    name: tag.name,
+                    checked: ""
+                }
+                renderData["tagList"] += Mustache.render(self.recipeUpdateTaglistTemplate, data);
+            });
+            var rendered = $(Mustache.render(self.recipeNewTemplate, renderData));
+            $('#recipeNewContainer').append(rendered);
+            $('#recipe-new-submit').on('click', self.onRecipeNew);
+        });
     };
 
     this.convertToMarkDownList = function(text) {
@@ -159,7 +190,14 @@ function MeineRezepte(){
         description = self.convertToMarkDownList(description);
         var content = $('#recipe-new-content').val();
 
-        self.backend.addRecipe(title, description, content, function(recipe){
+        var tagList = [];
+        $('.form-check-input', $('.recipe-new-tags')).each(function(i, el){
+            if (el.checked) {
+                tagList.push($(el).attr('data-tag-id'));
+            }
+        });
+
+        self.backend.addRecipe(title, description, content, tagList, function(recipe){
             $('#recipeNewContainer').empty();
             $('#recipeNewContainer').append($(self.recipeNewTemplate));
     
@@ -249,9 +287,29 @@ function MeineRezepte(){
         }
     };
 
-    this.displayAllRecipesByTitleStart = function(titleStart, recipeId){
+    this.displayAllRecipesByTagFilter = function(){
+        self.highlightAlphabetItem();
+
+        var tagId = $(this).attr('data-tag-id');
+
+        $(this).parent().siblings().removeClass('active');
+        $(this).parent().addClass('active');
+
         $('#recipesListContainer').empty();
-        self.backend.getRecipesByTitle(titleStart, self.displaySingleRecipe, function(){
+        self.backend.getRecipesByTag(tagId, function(data){
+            data.forEach(function(recipe){
+                self.displaySingleRecipe(recipe);
+            });
+        });
+    };
+
+    this.displayAllRecipesByTitleStart = function(titleStart, recipeId){
+        $('.tag-list-item', '#tagsListContainer').removeClass('active');
+        $('#recipesListContainer').empty();
+        self.backend.getRecipesByTitle(titleStart, function(data){
+            data.forEach(function(recipe){
+                self.displaySingleRecipe(recipe);
+            })
             self.highlightAlphabetItem(titleStart);
             if (recipeId != undefined) {
                 $('#collapseOne-' + recipeId).collapse('show');
@@ -276,14 +334,25 @@ function MeineRezepte(){
             return '';
         }
 
-        var rendered = $(Mustache.render(self.recipeTemplate, {
+        var renderData = {
             id: recipe.id,
             title: recipe.title,
             description: marked(recipe.description),
             content: marked(recipe.content),
             link: buildLink(recipe.title),
-            author: getAuthor()
-        }));
+            author: getAuthor(),
+            tagList: ""
+        }
+
+        if (recipe.tags != undefined) {
+            recipe.tags.forEach(function(tag){
+                var rendered = $(Mustache.render(self.tagTemplate, {name: tag.name, id: tag.id}));
+                rendered.addClass('active');
+                renderData["tagList"] += rendered[0].outerHTML;
+            });
+        }
+        
+        var rendered = $(Mustache.render(self.recipeTemplate, renderData));
 
         if (recipe.pictureList != undefined) {
             recipe.pictureList.forEach(function(picturePath) {
@@ -312,34 +381,55 @@ function MeineRezepte(){
         var recipeId = $(this).attr('data-recipe-id');
 
         self.backend.getRecipe(recipeId, function(recipe){
-            var rendered = $(Mustache.render(self.recipeUpdateTemplate, {
+            var renderData = {
                 id: recipe.id,
                 title: recipe.title,
                 description: recipe.description,
-                content: recipe.content
-            }));
+                content: recipe.content,
+                tagList: ""
+            }
 
-            if (recipe.pictureList != undefined) {
-                recipe.pictureList.forEach(function(picturePath) {
-                    var pic = $(Mustache.render(self.recipeUpdatePictureRemoveTemplate, {
-                        id: recipe.id,
-                        title: recipe.title,
-                        picturePath: picturePath,
-                        url: ''
-                    }));
-                    $('.pictureList', rendered).append(pic);
-                    $('.picture-remove', pic).on('click', self.onPictureRemove);
-                    $('img', pic).attr('src', picturePath);
+            function renderUpdateTemlate(){
+                var rendered = $(Mustache.render(self.recipeUpdateTemplate, renderData));
+    
+                if (recipe.pictureList != undefined) {
+                    recipe.pictureList.forEach(function(picturePath) {
+                        var pic = $(Mustache.render(self.recipeUpdatePictureRemoveTemplate, {
+                            id: recipe.id,
+                            title: recipe.title,
+                            picturePath: picturePath,
+                            url: ''
+                        }));
+                        $('.pictureList', rendered).append(pic);
+                        $('.picture-remove', pic).on('click', self.onPictureRemove);
+                        $('img', pic).attr('src', picturePath);
+                    });
+                }
+    
+                $('#collapseOne-' + recipeId).replaceWith(rendered);
+                $('#collapseOne-' + recipeId).collapse('show');
+    
+                self.initNewPicture();
+    
+                $('.recipe-update-submit', $('#collapseOne-' + recipeId)).on('click', function(){
+                    self.onRecipeUpdate(recipeId);
                 });
             }
 
-            $('#collapseOne-' + recipeId).replaceWith(rendered);
-            $('#collapseOne-' + recipeId).collapse('show');
-
-            self.initNewPicture();
-
-            $('.recipe-update-submit', $('#collapseOne-' + recipeId)).on('click', function(){
-                self.onRecipeUpdate(recipeId);
+            self.backend.getTagList(function(tags){
+                tags.forEach(function(tag){
+                    var data = {
+                        tag_id: tag.id,
+                        recipe_id: recipeId,
+                        name: tag.name,
+                        checked: ""
+                    }
+                    if (tag.recipes.some(el => parseInt(el.id) == parseInt(recipeId))) {
+                        data.checked = "checked";
+                    }
+                    renderData["tagList"] += Mustache.render(self.recipeUpdateTaglistTemplate, data);
+                });
+                renderUpdateTemlate();
             });
         });
     };
@@ -351,8 +441,15 @@ function MeineRezepte(){
         description = self.convertToMarkDownList(description);
         var content = $('.recipe-update-content', $('#collapseOne-' + recipeId)).val();
 
+        var tagList = [];
+        $('.form-check-input', $('#collapseOne-' + recipeId)).each(function(i, el){
+            if (el.checked) {
+                tagList.push($(el).attr('data-tag-id'));
+            }
+        });
+
         title = self.checkTitle(title);
-        self.backend.updateRecipe(recipeId, title, description, content, function(){
+        self.backend.updateRecipe(recipeId, title, description, content, tagList, function(){
             self.displayAllRecipesByTitleStart(title[0], recipeId);
         });
     };
@@ -365,7 +462,7 @@ function MeineRezepte(){
                 return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
             };
             title = recipe.title + ' - (copy-id: ' + randomString() + ')';
-            self.backend.addRecipe(title, recipe.description, recipe.content, function(recipe){
+            self.backend.addRecipe(title, recipe.description, recipe.content, recipe.tags, function(recipe){
                 $('#recipeNewContainer').empty();
                 $('#recipeNewContainer').append($(self.recipeNewTemplate));
         

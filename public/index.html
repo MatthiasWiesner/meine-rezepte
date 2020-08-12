@@ -75,6 +75,13 @@
 
     <div class="container">
         <div class="row">
+            <ul id="tagsListContainer" class="tagsListContainer" class="col mx-auto">
+            </ul>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
             <div id="recipesListContainer" class="col mx-auto">
             </div>
         </div>
@@ -83,6 +90,7 @@
             </div>
         </div>
     </div>
+
     <div class="container bottom">
         <div class="row">
             <div>
@@ -122,6 +130,12 @@
                 <h6>Zubereitung und sonstiges</h6>
                 <div>{{ &content }}</div>
             </div>
+            <div class="recipe-tags-container">
+                <h6>Tags</h6>
+                <ul class="tagsListContainer">
+                    {{{ tagList }}}
+                </ul>
+            </div>
             <div class="recipe-pictures-container">
                 <h6>Bilder</h6>
                 <div class="pictureList"></div>
@@ -134,23 +148,27 @@
 <script id="recipe-update-template" type="x-tmpl-mustache">
 <div id="collapseOne-{{ id }}" class="collapse" aria-labelledby="recipe-{{ id }}" data-parent="#recipesListContainer">
     <div class="card-body">
-        <div class="recipe-update-title-container">
+        <div class="recipe-title-container">
             <h6>Titel</h6>
             <input class="recipe-update-title" type="text" class="form-control" value="{{ title }}"></input>
         </div>
-        <div class="recipe-update-description-container">
+        <div class="recipe-description-container">
             <h6>Zutaten</h6>
             <textarea class="recipe-update-description form-control">{{ description }}</textarea>
         </div>
-        <div class="recipe-update-content-container">
+        <div class="recipe-content-container">
             <h6>Zubereitung und sonstiges</h6>
             <textarea class="recipe-update-content form-control">{{ content }}</textarea>
         </div>
-        <div class="recipe-update-content-container">
+        <div class="recipe-tags-container">
+            <h6>Tags</h6>
+            {{{ tagList }}}
+        </div>
+        <div class="recipe-content-container">
             <button type="submit" class="btn btn-primary recipe-update-submit">Submit</button>
         </div>
         
-        <div class="recipe-update-pictures-container">
+        <div class="recipe-pictures-container">
             <h6>Bilder</h6>
             <div class="pictureList"></div>
             <div class="pictureArea" data-recipe-id="{{ id }}" data-recipe-title="{{ title }}">
@@ -168,6 +186,13 @@
 </div>
 </script>
 
+<script id="recipe-update-taglist-template" type="x-tmpl-mustache">
+    <div class="recipe-update-taglist form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="tag-update-{{ id }}" data-recipe-id="{{ recipe_id }}" data-tag-id="{{ tag_id }}" value="" {{ checked }}>
+        <label class="form-check-label" for="tag-update-{{ id }}">{{ name }}</label>
+    </div>
+</script>
+
 <script id="recipe-new-template" type="x-tmpl-mustache">
 <div id="recipeNew" class="card recipe">
     <div class="card-header" id="recipe-new">
@@ -179,24 +204,32 @@
     </div>
     <div id="collapseOne-new" class="collapse" aria-labelledby="recipe-new">
         <div class="card-body">
-            <div class="recipe-update-title-container">
+            <div class="recipe-title-container">
                 <h6>Titel</h6>
                 <input id="recipe-new-title" type="text" class="form-control" placeholder="Titel"/>
             </div>
-            <div class="recipe-update-description-container">
+            <div class="recipe-description-container">
                 <h6>Zutaten</h6>
                 <textarea id="recipe-new-description" class="form-control" placeholder="Zutaten (in MarkDown) optimalerweise mit einem '-' vor jeder Zeile"></textarea>
             </div>
-            <div class="recipe-update-content-container">
+            <div class="recipe-content-container">
                 <h6>Zubereitung und sonstiges</h6>
                 <textarea id="recipe-new-content" class="form-control" placeholder="Zubereitung (in MarkDown) zB. __für fette Schrift__ oder *für schräge Schrift* "></textarea>
             </div>
-            <div class="recipe-update-content-container">
+            <div class="recipe-new-tags recipe-tags-container">
+                <h6>Tags</h6>
+                {{{ tagList }}}
+            </div>
+            <div class="recipe-content-container">
                 <button id="recipe-new-submit" type="submit" class="btn btn-primary">Submit</button>
             </div>
         </div>
     </div>
 </div>
+</script>
+
+<script id="tag-template" type="x-tmpl-mustache">
+    <li class="tag-list-item active"><a class="tag-list-item-link" data-tag-id="{{ id }}">{{ name }}</a></li>
 </script>
 
 <script type="text/template" id="tplImportSecrets">
