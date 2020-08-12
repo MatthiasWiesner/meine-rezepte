@@ -297,7 +297,7 @@ function MeineRezepte(){
 
         $('#recipesListContainer').empty();
         self.backend.getRecipesByTag(tagId, function(data){
-            data.forEach(function(recipe){
+            data.recipes.forEach(function(recipe){
                 self.displaySingleRecipe(recipe);
             });
         });
