@@ -545,7 +545,6 @@ function MeineRezepte() {
             try {
                 var data = JSON.parse($('#content', b).val());
             } catch (err) {
-                q
                 alert('The data could not be parsed. Please insert valid json');
                 return false;
             }
