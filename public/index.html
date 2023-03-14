@@ -84,7 +84,7 @@
                 <ul id="tagsListContainer" class="tagsListContainer tagsHeadList">
                 </ul>
             </div>
-            <div class="col-md-2" style="padding: 0px; margin: 0px;">
+            <div class="col-md-2 d-none d-sm-block" style="padding: 0px; margin: 0px;">
                 <input class="tag-new form-control" type="text" id="tag-new" value=""
                     placeholder="Tag eingeben, dann ENTER">
             </div>
@@ -245,7 +245,7 @@
     <li class="tag-list-item active">
         <a class="tag-list-item-link" data-tag-id="{{ id }}">{{ name }}</a>
     </li>
-    <a class="tag-delete-item fa fa-trash" data-tag-id="{{ id }}"></a>
+    <a class="tag-delete-item fa fa-trash d-none d-sm-block" data-tag-id="{{ id }}"></a>
 </script>
 
 <script type="text/template" id="tplImportSecrets">
