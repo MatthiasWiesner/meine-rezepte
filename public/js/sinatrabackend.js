@@ -41,7 +41,7 @@ function SinatraBackend() {
                 error_callback();
             } else {
                 console.log(error);
-                bootbox.alert("An error occured: " + error.status + ' ' + error.statusText);
+                bootbox.alert("An error occured: " + error.statusText + ' (' + error.status + '):' + '<br><code>' + error.responseText + '</code>');
             }
         });
     };
@@ -60,7 +60,7 @@ function SinatraBackend() {
             }
         })
             .fail(function (error) {
-                bootbox.alert("An error occured: " + error.status + ' ' + error.statusText);
+                bootbox.alert("An error occured: " + error.statusText + ' (' + error.status + '):' + '<br><code>' + error.responseText + '</code>');
             });
     };
 

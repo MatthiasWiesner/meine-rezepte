@@ -555,7 +555,7 @@ function MeineRezepte() {
                 }
                 // Zutatenliste soll immer eine MarkDown Liste sein
                 description = self.convertToMarkDownList(recipe.description);
-                self.backend.addRecipe(title, description, recipe.content, function () { });
+                self.backend.addRecipe(title, description, recipe.content, [], function () { });
             });
             $('#recipeNewContainer').empty();
             $('#recipeNewContainer').append($(self.recipeNewTemplate));
